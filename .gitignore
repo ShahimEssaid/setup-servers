@@ -1,0 +1,10 @@
+/.venv/
+/build/
+/dist/
+/src/setup_server.egg-info/
+/env.sh
+/env-local.sh
+/env-local-example.sh
+/setup-server/
+/setup-db/
+/work-directory/
