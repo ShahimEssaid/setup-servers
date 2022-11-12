@@ -27,4 +27,4 @@ zip-safe = false
 include-package-data = true
 
 [project.optional-dependencies]
-build = ["build", "twine"]
+build = ["click", "build", "twine"]

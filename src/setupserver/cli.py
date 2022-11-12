@@ -1,7 +1,6 @@
 import os
 import pathlib
 import shutil
-import sys
 
 import click
 
@@ -34,10 +33,20 @@ class RunCli(click.MultiCommand):
         return command
 
 
+class ServerSetup:
+    def run(self):
+        print( "Running from the ServerSetup")
+
+
+server_setup = None
+
+
 @click.command(cls=RunCli)
 def run():
-    print("Main: "+ __name__)
-    print("Running" + str(sys.argv))
+    print("Running")
+    global server_setup
+    server_setup = ServerSetup()
+    server_setup.run()
 
 
 @click.command()
