@@ -18,6 +18,7 @@ export SETUP_SERVER_HOME=$(realpath "${DIR}/../..")
 cd "$SETUP_SERVER_HOME"
 . "${SETUP_SERVER_HOME}/env.sh"
 
-#  =========== END OF COMMON HEADER. See setup_servers/bin/.template.sh
+#  =========== END OF COMMON HEADER. See setup_servers/setup-db/.template.sh
 
 . "${SETUP_SERVER_VENV}/bin/activate"
+setup-server "$@"

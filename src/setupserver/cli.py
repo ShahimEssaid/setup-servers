@@ -5,13 +5,12 @@ import sys
 
 import click
 
-TEMPLATE = os.path.join(os.path.dirname(__file__), "template/")
+TEMPLATE = os.path.join(os.path.dirname(__file__), "../template/")
 SETUP_SERVER_HOME = pathlib.Path().absolute()
 
 
 class RunCli(click.MultiCommand):
     def __init__(self, name, **kwargs):
-        print(kwargs)
         super().__init__(self, name, chain=True, **kwargs)
 
     def list_commands(self, ctx):
@@ -26,7 +25,7 @@ class RunCli(click.MultiCommand):
 
     def get_command(self, ctx, name):
         ns = {}
-        fn = os.path.join(SETUP_SERVER_HOME, name, "bin", name + '.py')
+        fn = os.path.join(SETUP_SERVER_HOME, name, "setup-db", name + '.py')
         with open(fn) as f:
             code = compile(f.read(), fn, 'exec')
             eval(code, ns, ns)
@@ -36,10 +35,9 @@ class RunCli(click.MultiCommand):
 
 
 @click.command(cls=RunCli)
-# @click.option("--name")
-# @click.argument("something")
-def run(name="name", something="something"):
-    print("Running" + str(sys.argv) + name)
+def run():
+    print("Main: "+ __name__)
+    print("Running" + str(sys.argv))
 
 
 @click.command()
