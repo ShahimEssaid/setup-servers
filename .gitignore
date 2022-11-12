@@ -9,7 +9,5 @@
 /setup-db/
 /work-directory/
 /dynamic_loading_test.py
-/tmp/dynamic_dependency.py
-/tmp/dynamic_load.py
-/src/setupserver/helpers/
-/tmp/kwargs_example.py
+/src/setupservers/helpers/
+/tmp*
