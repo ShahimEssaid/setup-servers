@@ -21,4 +21,9 @@ cd "$SETUP_SERVER_HOME"
 #  =========== END OF COMMON HEADER. See setup_servers/setup-db/.template.sh
 
 . "${SETUP_SERVER_VENV}/bin/activate"
-setup-servers "$@"
+setup-servers  \
+  --remote-pycharm-debug \
+  --pycharm-host localhost \
+  --pycharm-port 11111 \
+  setup-db --setup-directory-name testing1 \
+  "$@"

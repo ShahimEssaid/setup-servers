@@ -30,3 +30,4 @@ include-package-data = true
 
 [project.optional-dependencies]
 build = ["build", "twine"]
+pycharm = ['pydevd-pycharm~=222.4345.23']
