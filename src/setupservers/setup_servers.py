@@ -1,11 +1,23 @@
 import os
 import pathlib
 import shutil
-
+import sys
 import click
 
+from setupservers import servers_setup
+from setupservers import api
+
 TEMPLATE = os.path.join(os.path.dirname(__file__), "../template/")
-SETUP_SERVER_HOME = pathlib.Path().absolute()
+
+orig_init = click.core.Option.__init__
+
+
+def _new_init(self, *args, **kwargs):
+    orig_init(self, *args, **kwargs)
+    self.show_default = True
+
+
+click.core.Option.__init__ = _new_init
 
 
 class RunCli(click.MultiCommand):
@@ -13,13 +25,13 @@ class RunCli(click.MultiCommand):
         super().__init__(self, name, chain=True, **kwargs)
 
     def list_commands(self, ctx):
-        home_dir = pathlib.Path(os.curdir).absolute()
-        work_dir = pathlib.Path(os.curdir).absolute() / "working-directory"
 
-        if len(ctx.help_option_names) > 0 and not servers_setup.home_directory.exists():
-            raise Exception("You need to be in installation directory to get help output.")
+        if not (servers_setup.home_directory / "setup-servers").exists():
+            print("You need to be in an installation/home directory. \nCurrent home directory doesn't seem to be an "
+                  "installation:\n\t" + str(servers_setup.home_directory))
+            sys.exit(10)
         rv = []
-        for setup_dir in next(os.walk(home_dir))[1]:
+        for setup_dir in next(os.walk(servers_setup.home_directory))[1]:
             if setup_dir == "setup-servers":
                 continue
             if setup_dir.startswith("setup-"):
@@ -30,26 +42,13 @@ class RunCli(click.MultiCommand):
     def get_command(self, ctx, name):
         ns = {}
         command_path = servers_setup.home_directory / name / name / (name + ".py")
-        with open(command_path) as f:
-            code = compile(f.read(), name + ".py", 'exec')
-            eval(code, ns, ns)
-            command = ns[name.replace("-", "_")]
+        command_module = api.load_module(name, command_path)
+        command = getattr(command_module, name.replace("-", "_"))
+        # with open(command_path) as f:
+        #     code = compile(f.read(), name + ".py", 'exec')
+        #     eval(code, ns, ns)
+        #     command = ns[name.replace("-", "_")]
         return command
-
-
-class ServersSetup:
-    def __init__(self):
-        self.home_directory = pathlib.Path(os.curdir).absolute()
-        self.working_directory = pathlib.Path(os.curdir).absolute() / "working-directory"
-
-    def run(self):
-        print("Running from ServersSetup")
-        print("Home directory: " + str(self.home_directory))
-        print("Working directory: " + str(self.working_directory))
-        print()
-
-
-servers_setup = ServersSetup()
 
 
 @click.command(cls=RunCli)

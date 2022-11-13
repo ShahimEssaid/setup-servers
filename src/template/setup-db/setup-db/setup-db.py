@@ -1,4 +1,5 @@
 import click
+import setupservers.api as api
 from setupservers import servers_setup
 
 
@@ -8,6 +9,9 @@ class DbSetup:
         self.module = None
         self.module_path = None
 
+
+class SetupDb(api.SetupBase):
+    pass
 
 """
 

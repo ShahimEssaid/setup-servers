@@ -227,7 +227,7 @@
       <workItem from="1668115298973" duration="635000" />
       <workItem from="1668115949311" duration="94000" />
       <workItem from="1668116100287" duration="8749000" />
-      <workItem from="1668172273524" duration="36964000" />
+      <workItem from="1668172273524" duration="40347000" />
     </task>
     <task id="LOCAL-00001" summary="runs.">
       <created>1668191859388</created>
@@ -257,7 +257,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668294275003</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary=". home and working directories. help fixed.">
+      <created>1668299625232</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1668299625232</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -279,7 +286,8 @@
     <MESSAGE value=". runs." />
     <MESSAGE value="run_both works to speedup testing." />
     <MESSAGE value=". home and working directories. runs." />
-    <option name="LAST_COMMIT_MESSAGE" value=". home and working directories. runs." />
+    <MESSAGE value=". home and working directories. help fixed." />
+    <option name="LAST_COMMIT_MESSAGE" value=". home and working directories. help fixed." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -341,31 +349,31 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
-          <line>60</line>
+          <line>92</line>
           <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
-          <line>31</line>
+          <line>63</line>
           <option name="timeStamp" value="58" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
-          <line>27</line>
+          <line>59</line>
           <option name="timeStamp" value="60" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/setup_servers2$run_both.coverage" NAME="run_both Coverage Results" MODIFIED="1668299229923" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
+    <SUITE FILE_PATH="coverage/setup_servers2$run_both.coverage" NAME="run_both Coverage Results" MODIFIED="1668299480340" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
     <SUITE FILE_PATH="coverage/setup_servers2$hello.coverage" NAME="hello Coverage Results" MODIFIED="1668172818902" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/setupservers" />
     <SUITE FILE_PATH="coverage/setup_servers2$file_locking.coverage" NAME="file_locking Coverage Results" MODIFIED="1668289844789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/example" />
     <SUITE FILE_PATH="coverage/setup_servers2$setup_server.coverage" NAME="setup-server Coverage Results" MODIFIED="1668191792979" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/setup_servers2$dynamic_load.coverage" NAME="dynamic_load Coverage Results" MODIFIED="1668195041289" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/setupserver" />
     <SUITE FILE_PATH="coverage/setup_servers2$cli.coverage" NAME="cli Coverage Results" MODIFIED="1668174632226" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/setupserver" />
     <SUITE FILE_PATH="coverage/setup_servers2$setup_server_install.coverage" NAME="setup-server-install Coverage Results" MODIFIED="1668180973592" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/setup_servers2$run_help.coverage" NAME="run_help Coverage Results" MODIFIED="1668299342117" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
+    <SUITE FILE_PATH="coverage/setup_servers2$run_help.coverage" NAME="run_help Coverage Results" MODIFIED="1668300898544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
     <SUITE FILE_PATH="coverage/setup_servers2$kwargs_example.coverage" NAME="kwargs_example Coverage Results" MODIFIED="1668274968225" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tmp" />
   </component>
 </project>
