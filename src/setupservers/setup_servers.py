@@ -13,10 +13,14 @@ class RunCli(click.MultiCommand):
         super().__init__(self, name, chain=True, **kwargs)
 
     def list_commands(self, ctx):
-        raise Exception("Didn't expect to have to list commands")
+        home_dir = pathlib.Path(os.curdir).absolute()
+        work_dir = pathlib.Path(os.curdir).absolute() / "working-directory"
+
+        if len(ctx.help_option_names) > 0 and not servers_setup.home_directory.exists():
+            raise Exception("You need to be in installation directory to get help output.")
         rv = []
-        for setup_dir in next(os.walk(SETUP_SERVER_HOME))[1]:
-            if setup_dir == "setup-server":
+        for setup_dir in next(os.walk(home_dir))[1]:
+            if setup_dir == "setup-servers":
                 continue
             if setup_dir.startswith("setup-"):
                 rv.append(setup_dir)
@@ -25,26 +29,27 @@ class RunCli(click.MultiCommand):
 
     def get_command(self, ctx, name):
         ns = {}
-        with open(home_directory / name / name / (name + ".py")) as f:
+        command_path = servers_setup.home_directory / name / name / (name + ".py")
+        with open(command_path) as f:
             code = compile(f.read(), name + ".py", 'exec')
             eval(code, ns, ns)
-            command_name = name.replace("-", "_")
-            command = ns[command_name]
+            command = ns[name.replace("-", "_")]
         return command
 
 
-class ServerSetup:
+class ServersSetup:
     def __init__(self):
-        self.working_dir = None
+        self.home_directory = pathlib.Path(os.curdir).absolute()
+        self.working_directory = pathlib.Path(os.curdir).absolute() / "working-directory"
 
     def run(self):
-        print("Running from the ServerSetup")
+        print("Running from ServersSetup")
+        print("Home directory: " + str(self.home_directory))
+        print("Working directory: " + str(self.working_directory))
+        print()
 
 
-server_setup = ServerSetup()
-
-home_directory = None
-working_directory = None
+servers_setup = ServersSetup()
 
 
 @click.command(cls=RunCli)
@@ -53,21 +58,10 @@ working_directory = None
 @click.option("--working-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True, exists=True),
               default=pathlib.Path(os.curdir).absolute() / "working-directory")
 def run(home_dir, working_dir):
-    global working_directory, home_directory
-    working_directory = working_dir
-    home_directory = home_dir
-    os.makedirs(home_directory, exist_ok=True)
-    os.makedirs(working_directory, exist_ok=True)
-
-    if working_dir is not None:
-        if working_directory is not None and working_directory != working_dir:
-            raise Exception(
-                "Working directory is not the same. Have:" + working_directory + " but got:" + working_dir)
-        else:
-            working_directory = working_dir
+    servers_setup.home_directory = home_dir;
+    servers_setup.working_directory = working_dir;
     print("Running")
-
-    server_setup.run()
+    servers_setup.run()
 
 
 @click.command()
@@ -77,9 +71,8 @@ def run(home_dir, working_dir):
               default=pathlib.Path(os.curdir).absolute() / "working-directory")
 def install(home_dir, working_dir):
     print("Installing")
-    global working_directory, home_directory
-    working_directory = working_dir
-    home_directory = home_dir
-    os.makedirs(home_directory, exist_ok=True)
-    os.makedirs(working_directory, exist_ok=True)
-    shutil.copytree(TEMPLATE, home_directory, dirs_exist_ok=True)
+    servers_setup.home_directory = home_dir;
+    servers_setup.working_directory = working_dir;
+    os.makedirs(home_dir, exist_ok=True)
+    os.makedirs(working_dir, exist_ok=True)
+    shutil.copytree(TEMPLATE, home_dir, dirs_exist_ok=True)

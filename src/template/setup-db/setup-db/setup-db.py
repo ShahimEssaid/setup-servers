@@ -1,5 +1,5 @@
 import click
-from setupservers import server_setup
+from setupservers import servers_setup
 
 
 class DbSetup:
@@ -9,16 +9,17 @@ class DbSetup:
         self.module_path = None
 
 
-
-
 """
 
-provider directory names are:   LOCAL-PREFIX_PY-PROVIDER-FILE-NAME_LOCAL-SUFFIX
-    LOCAL-PREFIX is for local use and can help with directory sorting if and when it matters
-    PY-PROVIDER-FILE-NAME is the provider py file that will be used and called as the provider
-    LOCAL-SUFFIX
+provider directory names are: LOCAL-PREFIX_PY-PROVIDER-FILE-NAME_LOCAL-SUFFIX
 
-provider_type: this is confirmed by the provider but its directory can hint in it with 
+* LOCAL-PREFIX: is for local use and can help with directory sorting if 
+    and when it matters. It has no special meaning.
+* PY-PROVIDER-FILE-NAME: is the provider's file name without the .py that will be used and called as the provider.
+    If there is no provider file match, a file named setup-*  will be looked for.
+* LOCAL-SUFFIX: a local hint to the specifics of the provider. For example, the same git submodule checked out at
+    a different revision/version. The suffix can be a clear hint for this checkout.
+     
 """
 
 

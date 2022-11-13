@@ -20,8 +20,8 @@ requires-python = ">=3.9"
 authors = [{ name = "Shahim Essaid" }]
 
 [project.scripts]
-setup-servers = "setupserver.cli:run"
-setup-servers-install = "setupserver.cli:install"
+setup-servers = "setupservers.setup_servers:run"
+setup-servers-install = "setupservers.setup_servers:install"
 
 [tool.setuptools]
 zip-safe = false

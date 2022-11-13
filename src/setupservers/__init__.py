@@ -1,1 +1,1 @@
-from .setup_server import server_setup
+from .setup_servers import servers_setup
