@@ -63,7 +63,7 @@
       <recent name="$PROJECT_DIR$/src/setupserver/helpers" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.run_help">
+  <component name="RunManager" selected="Python.run_both">
     <configuration name="Unnamed" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="setup-servers2" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -86,7 +86,7 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="dynamic_load" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+    <configuration name="click_color" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="setup-servers2" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -94,12 +94,12 @@
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
       <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/setupserver" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/example" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/tmp/dynamic_load.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/example/click_color.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -196,22 +196,46 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="walk" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="setup-servers2" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/src/example" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/src/example/walk.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Python.main" />
       <item itemvalue="Python.Unnamed" />
       <item itemvalue="Python.run_both" />
       <item itemvalue="Python.run_help" />
+      <item itemvalue="Python.click_color" />
+      <item itemvalue="Python.walk" />
       <item itemvalue="Python.file_locking" />
-      <item itemvalue="Python.dynamic_load" />
       <item itemvalue="Python.kwargs_example" />
       <item itemvalue="Python.setup-server-install" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.click_color" />
+        <item itemvalue="Python.walk" />
         <item itemvalue="Python.file_locking" />
         <item itemvalue="Python.run_both" />
         <item itemvalue="Python.kwargs_example" />
-        <item itemvalue="Python.dynamic_load" />
       </list>
     </recent_temporary>
   </component>
@@ -227,7 +251,7 @@
       <workItem from="1668115298973" duration="635000" />
       <workItem from="1668115949311" duration="94000" />
       <workItem from="1668116100287" duration="8749000" />
-      <workItem from="1668172273524" duration="40347000" />
+      <workItem from="1668172273524" duration="62934000" />
     </task>
     <task id="LOCAL-00001" summary="runs.">
       <created>1668191859388</created>
@@ -264,7 +288,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668299625232</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary=". home and working directories. help fixed..">
+      <created>1668306520167</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1668306520167</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -287,7 +318,8 @@
     <MESSAGE value="run_both works to speedup testing." />
     <MESSAGE value=". home and working directories. runs." />
     <MESSAGE value=". home and working directories. help fixed." />
-    <option name="LAST_COMMIT_MESSAGE" value=". home and working directories. help fixed." />
+    <MESSAGE value=". home and working directories. help fixed.." />
+    <option name="LAST_COMMIT_MESSAGE" value=". home and working directories. help fixed.." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -313,7 +345,7 @@
           <option name="timeStamp" value="19" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/template/setup-db/setup-db/setup-db.py</url>
+          <url>file://$PROJECT_DIR$/src/template/setup-db/setup-db/setup_db.py</url>
           <line>5</line>
           <option name="timeStamp" value="20" />
         </line-breakpoint>
@@ -344,36 +376,63 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/run_both.py</url>
-          <line>14</line>
+          <line>16</line>
           <option name="timeStamp" value="53" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
-          <line>92</line>
-          <option name="timeStamp" value="56" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
-          <line>63</line>
-          <option name="timeStamp" value="58" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
-          <line>59</line>
+          <line>40</line>
           <option name="timeStamp" value="60" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/setupservers/api.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/example/walk.py</url>
+          <line>10</line>
+          <option name="timeStamp" value="64" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/example/walk.py</url>
+          <line>5</line>
+          <option name="timeStamp" value="65" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/setupservers/setup_servers.py</url>
+          <line>39</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/run_help.py</url>
+          <line>12</line>
+          <option name="timeStamp" value="68" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/src/template/setup-db/setup-db/setup_db.py</url>
+          <line>57</line>
+          <option name="timeStamp" value="71" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="api" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/setup_servers2$run_both.coverage" NAME="run_both Coverage Results" MODIFIED="1668299480340" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
+    <SUITE FILE_PATH="coverage/setup_servers2$run_both.coverage" NAME="run_both Coverage Results" MODIFIED="1668375522050" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
     <SUITE FILE_PATH="coverage/setup_servers2$hello.coverage" NAME="hello Coverage Results" MODIFIED="1668172818902" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/setupservers" />
+    <SUITE FILE_PATH="coverage/setup_servers2$walk.coverage" NAME="walk Coverage Results" MODIFIED="1668357044879" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/example" />
     <SUITE FILE_PATH="coverage/setup_servers2$file_locking.coverage" NAME="file_locking Coverage Results" MODIFIED="1668289844789" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/example" />
     <SUITE FILE_PATH="coverage/setup_servers2$setup_server.coverage" NAME="setup-server Coverage Results" MODIFIED="1668191792979" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/setup_servers2$dynamic_load.coverage" NAME="dynamic_load Coverage Results" MODIFIED="1668195041289" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/setupserver" />
     <SUITE FILE_PATH="coverage/setup_servers2$cli.coverage" NAME="cli Coverage Results" MODIFIED="1668174632226" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/setupserver" />
     <SUITE FILE_PATH="coverage/setup_servers2$setup_server_install.coverage" NAME="setup-server-install Coverage Results" MODIFIED="1668180973592" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/setup_servers2$run_help.coverage" NAME="run_help Coverage Results" MODIFIED="1668300898544" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
+    <SUITE FILE_PATH="coverage/setup_servers2$run_help.coverage" NAME="run_help Coverage Results" MODIFIED="1668374451423" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/tmp3" />
     <SUITE FILE_PATH="coverage/setup_servers2$kwargs_example.coverage" NAME="kwargs_example Coverage Results" MODIFIED="1668274968225" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/tmp" />
+    <SUITE FILE_PATH="coverage/setup_servers2$click_color.coverage" NAME="click_color Coverage Results" MODIFIED="1668374146270" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/src/example" />
   </component>
 </project>

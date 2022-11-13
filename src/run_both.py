@@ -10,6 +10,8 @@ if __name__ == '__main__':
     sys.argv = ['setup-servers-install']
     install(standalone_mode=False)
 
-    sys.argv = ["setup-servers", "setup-db", "--db-type", "db-type", "--db-provider", "db-provider"]
+    sys.argv.append("setup-db")
+    sys.argv.append("--setup-directory-name")
+    sys.argv.append("setup1")
     run1 = run()
     sys.exit()

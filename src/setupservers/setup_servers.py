@@ -5,6 +5,7 @@ import sys
 import click
 
 from setupservers import servers_setup
+
 from setupservers import api
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "../template/")
@@ -41,9 +42,9 @@ class RunCli(click.MultiCommand):
 
     def get_command(self, ctx, name):
         ns = {}
-        command_path = servers_setup.home_directory / name / name / (name + ".py")
-        command_module = api.load_module(name, command_path)
-        command = getattr(command_module, name.replace("-", "_"))
+        command_path = servers_setup.home_directory / name / name / (name.replace("-", "_") + ".py")
+        command_module = api.load_module(name.replace("-", "_"), command_path)
+        command = getattr(command_module, name.replace("-", "_") + '_command')
         # with open(command_path) as f:
         #     code = compile(f.read(), name + ".py", 'exec')
         #     eval(code, ns, ns)
