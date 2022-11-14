@@ -11,3 +11,7 @@
 /dynamic_loading_test.py
 /src/setupservers/helpers/
 /tmp*
+!/tmp-remote-debug
+/tmp-remote-debug/.venv/
+/tmp-remote-debug/
+__pycache__/
