@@ -10,7 +10,7 @@ import docker.errors as errors
 
 
 def can_provide_db(setup_db) -> bool:
-    setup_info: setupservers.SetupInfo = setup_db.setup_info
+    setup_info: setupservers.SetupInfo = setup_db.info
     try:
         docker_client.images.get_registry_data(f"{setup_info.dbs_name}:{setup_info.dbs_version}")
     except errors.NotFound:
@@ -19,7 +19,7 @@ def can_provide_db(setup_db) -> bool:
 
 
 def provide_db(setup_db):
-    info: setupservers.SetupInfo = setup_db.setup_info
+    info: setupservers.SetupInfo = setup_db.info
 
     for action in setup_db.dbs_actions:
         if action == 'run':

@@ -20,8 +20,8 @@ class SetupDb(setupservers.SetupBase):
                          setup_home_path,
                          provider_name)
 
-        if self.setup_info.info_status == setupservers.SetupInfo.STATUS_CREATED:
-            if self.setup_info.dbs_name != dbs_name or self.setup_info.dbs_version != dbs_version:
+        if self.info.info_status == setupservers.SetupInfo.STATUS_CREATED:
+            if self.info.dbs_name != dbs_name or self.info.dbs_version != dbs_version:
                 raise Exception(f"SetupInfo dbs name and version didn't match")
 
         self.dbs_actions: list[str] = dbs_action
@@ -29,30 +29,18 @@ class SetupDb(setupservers.SetupBase):
     def run(self):
         provider_name = None
         provider_relative_path = None
-        if self.setup_provider_name is not None and self.setup_provider_name in self.provider_name_relative_path_map:
-            provider_name = self.setup_provider_name
-            provider_relative_path = self.provider_name_relative_path_map[self.setup_provider_name]
-        module = setupservers.load_module(self.setup_home_path / provider_relative_path, self.setup_info.setup_name,
+        if self.provider_name is not None and self.provider_name in self.provider_name_relative_path_map:
+            provider_name = self.provider_name
+            provider_relative_path = self.provider_name_relative_path_map[self.provider_name]
+        module = setupservers.load_module(self.command_home_path / provider_relative_path, self.info.setup_name,
                                           str(provider_relative_path))
         can_provide = getattr(module, 'can_provide_db')
         if can_provide(self):
             getattr(module, 'provide_db')(self)
-        self.setup_info.info_status = setupservers.SetupInfo.STATUS_CURRENT
-        print(provider_relative_path)
+        self.info.info_status = setupservers.SetupInfo.STATUS_CURRENT
 
 
 setup_db: typing.Optional[SetupDb] = None
-
-"""
-provider directory names are: LOCAL-PREFIX_PY-PROVIDER-FILE-NAME_LOCAL-SUFFIX
-
-* LOCAL-PREFIX: is for local use and can help with directory sorting if 
-    and when it matters. It has no special meaning.
-* PY-PROVIDER-FILE-NAME: is the provider's file name without the .py that will be used and called as the provider.
-    If there is no provider file match, a file named setup-*  will be looked for.
-* LOCAL-SUFFIX: a local hint to the specifics of the provider. For example, the same git submodule checked out at
-    a different revision/version. The suffix can be a clear hint for this checkout.
-"""
 
 
 @click.command()
@@ -88,8 +76,7 @@ def setup_db_command(dbs_name,
     info.dbs_host = dbs_host
     info.dbs_port = dbs_port
 
-
-    dbs_provider_name_clean = setupservers.provider_name(dbs_provider)
+    dbs_provider_name_clean = setupservers.provider_name_from_dir(dbs_provider)
     setup_home_path = pathlib.Path(__file__).parent.parent
 
     global setup_db
@@ -101,4 +88,3 @@ def setup_db_command(dbs_name,
                        dbs_provider_name_clean)
     setup_db.run()
     setup_db.save()
-    print('Hello')

@@ -22,18 +22,26 @@ cd "$SETUP_SERVER_HOME"
 
 . "${SETUP_SERVER_VENV}/bin/activate"
 setup-servers \
-  #--remote-pycharm-debug \
+  --remote-pycharm-debug \
   --pycharm-host localhost \
   --pycharm-port 11111 \
-  setup-db \
-  --dbs-name postgres \
-  --dbs-version latest \
-  --dbs-user postgres \
-  --dbs-pass postgres \
-  --dbs-uid  $(id -u ) \
-  --dbs-host localhost \
-  --dbs-port 7777 \
-  --dbs-provider postgres-v1 \
-  --dbs-action run \
-  --setup-directory-name testing1 \
+  setup-fhir-server \
+  --setup-directory-name fhir-server-1 \
+  --dbs-type postgres \
+  --dbs-setup-name hapi-setup \
+  --db-user hapi \
+  --db-pass hapi \
   "$@"
+
+
+#  setup-db \
+#  --dbs-name postgres \
+#  --dbs-version latest \
+#  --dbs-user postgres \
+#  --dbs-pass postgres \
+#  --dbs-uid  $(id -u ) \
+#  --dbs-host localhost \
+#  --dbs-port 7777 \
+#  --dbs-provider postgres-v1 \
+#  --dbs-action run \
+#  --setup-directory-name testing1 \

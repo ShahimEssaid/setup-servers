@@ -13,54 +13,23 @@ import docker
 
 SETUP_INFO_YAML = 'setup-info.yaml'
 WORK_DIRECTORY_NAME = 'work-directory'
-
 docker_client = docker.from_env()
 
 
-#
-# class BaseInfo(yaml.YAMLObject):
-#     NEW = 'New'
-#     CURRENT = 'Current'
-#     CLOSED = 'Closed'
-#
-#     def __init__(self):
-#         self.info_status: str = BaseInfo.NEW
-#         self.setup_name: typing.Optional[str] = None
-#
-#
-# class DbInfo(BaseInfo):
-#     def __init__(self):
-#         super().__init__()
-#         self.dbs_name: typing.Optional[str] = None
-#         self.dbs_version: typing.Optional[str] = None
-
-
 class SetupInfo:
-    STATUS_NEW = 'New'
-    STATUS_CREATED = 'Created'
-    STATUS_CURRENT = 'Current'
-    STATUS_CLOSED = 'Closed'
 
-    INFO_STATUS = 'info_status'
-
-    def __init__(self, setup_directory_path: typing.Union[str, pathlib.Path]):
-        setup_path = pathlib.Path(str(setup_directory_path))
-        setup_info_path = setup_path / SETUP_INFO_YAML
-
-        if setup_info_path.exists():
-            with open(setup_info_path) as f:
+    def __init__(self, info_directory_path: typing.Union[str, pathlib.Path]):
+        info_path = pathlib.Path(info_directory_path) / SETUP_INFO_YAML
+        if info_path.exists():
+            with open(info_path) as f:
                 self.__dict__ = yaml.unsafe_load(f)
-        else:
-            self.info_status = SetupInfo.STATUS_NEW
-
-        self.setup_path: str = str(setup_path)
-        self.setup_info_path: str = str(setup_info_path)
+        self.info_path: str = str(info_path)
 
     def __getattr__(self, item):
         return None
 
     def save(self):
-        setup_info_path = pathlib.Path(self.setup_info_path)
+        setup_info_path = pathlib.Path(self.info_path)
         setup_info_path.parent.mkdir(parents=True, exist_ok=True)
         with open(setup_info_path, 'w') as f:
             f.write(yaml.dump(self.__dict__))
@@ -68,56 +37,21 @@ class SetupInfo:
 
 class SetupBase:
 
-    def __init__(self, setup_name: str, setup_info: SetupInfo, setup_home_path: pathlib.Path, setup_provider_name: str):
-        if setup_info.info_status == SetupInfo.STATUS_CLOSED:
-            raise Exception("SetupInfo already closed")
+    def __init__(self, setup_name: str, info: SetupInfo, setup_home_path: pathlib.Path, provider_name: str):
 
-        if setup_info.info_status == SetupInfo.STATUS_NEW:
-            setup_info.setup_name = setup_name
-        else:
-            if setup_info.setup_name != setup_name:
-                raise Exception(f"Setup name {setup_name} did not match setup info name {setup_info.setup_name}")
+        if info.setup_name is None:
+            info.setup_name = setup_name
 
-        self.setup_info = setup_info
-        self.setup_home_path = setup_home_path
-        self.setup_provider_name = setup_provider_name
-        self.provider_name_relative_path_map = provider_name_dir_map(self.setup_home_path, self.setup_info.setup_name)
+        if info.setup_name != setup_name:
+            raise Exception(f"Setup name {setup_name} did not match setup info name {info.setup_name}")
+
+        self.info = info
+        self.command_home_path = setup_home_path
+        self.provider_name = provider_name
+        self.provider_name_relative_path_map = provider_name_dir_map(self.command_home_path, self.info.setup_name)
 
     def save(self):
-        # self.setup_info.info_status = SetupInfo.STATUS_CURRENT
-        self.setup_info.save()
-
-
-class SetupProviderBase:
-    def __init__(self, setup: SetupBase):
-        self.setup = setup
-
-    def find_provider_module(self) -> types.ModuleType:
-        dir_parts = str(self.provider_directory.name).split("--")
-        if len(dir_parts) > 3:
-            print("Setup provider directory has too many underscores: " + str(self.provider_directory))
-            sys.exit(11)
-        if len(dir_parts) == 3:
-            provider_file_name = dir_parts[1]
-        else:
-            provider_file_name = dir_parts[0]
-        provider_file_name = provider_file_name + ".py"
-        self.provider_path = self.provider_directory / provider_file_name
-        if not self.provider_path.exists():
-            self.provider_path = self.provider_directory / (self.setup.setup_name + ".py")
-        if not self.provider_path.exists():
-            raise Exception("Failed to find provider path for provider directory {dir} and setup name {name}".format(
-                dir=self.provider_directory, name=self.setup.setup_name))
-        # we have the provider path. Build a module name to load it
-        provider_module_name = self.setup.setup_name + "_"
-        if len(dir_parts) == 3:
-            provider_module_name += dir_parts[1] + "_" + dir_parts[2]
-        else:
-            provider_module_name += "_".join(dir_parts)
-
-        self.provider_module = load_module(self.provider_path, provider_module_name)
-
-        return self.provider_module
+        self.info.save()
 
 
 class ServersSetup:
@@ -162,7 +96,7 @@ def provider_name_dir_map(providers_dir_path: pathlib.Path, setup_name: str) -> 
         provider_path = providers_dir_path / provider_relative
         if not provider_path.exists():
             continue
-        name = provider_name(provider_dir)
+        name = provider_name_from_dir(provider_dir)
         if name in providers:
             console_error(
                 f"Found duplicate provider name: {name}"
@@ -173,7 +107,7 @@ def provider_name_dir_map(providers_dir_path: pathlib.Path, setup_name: str) -> 
     return providers
 
 
-def provider_name(directory_name: str):
+def provider_name_from_dir(directory_name: str):
     if directory_name is None:
         return None
     provider_dir_clean = re.sub('--+', '--', directory_name)
@@ -248,3 +182,18 @@ def is_port_in_use(host: str, port: int) -> bool:
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         return s.connect_ex((host, port)) == 0
+
+
+def to_full_path(path):
+    if os.path.isabs(path):
+        return path
+    else:
+        full_path = os.path.join(servers_setup.work_directory, path)
+        full_path = os.path.normpath(full_path)
+        return full_path
+
+
+def to_relative_path(path):
+    if os.path.isabs:
+        return os.path.relpath(path, servers_setup.work_directory)
+    return path

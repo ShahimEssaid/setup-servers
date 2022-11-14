@@ -15,8 +15,7 @@ dependencies = [
     'click',
     "filelock",
     "pyyaml",
-    "docker",
-    'pydevd-pycharm~=222.4345.23'
+    "docker"
 ]
 
 requires-python = ">=3.9"
