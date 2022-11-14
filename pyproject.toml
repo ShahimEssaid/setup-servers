@@ -14,7 +14,8 @@ classifiers = [
 dependencies = [
     'click',
     "filelock",
-    "pyyaml"
+    "pyyaml",
+    "docker"
 ]
 
 requires-python = ">=3.9"

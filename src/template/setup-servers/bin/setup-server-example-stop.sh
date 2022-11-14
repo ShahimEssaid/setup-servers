@@ -26,14 +26,7 @@ setup-servers \
   --pycharm-host localhost \
   --pycharm-port 11111 \
   setup-db \
-  --dbs-name postgres \
-  --dbs-version latest \
-  --dbs-user postgres \
-  --dbs-pass postgres \
-  --dbs-uid  $(id -u ) \
-  --dbs-host localhost \
-  --dbs-port 7777 \
+  --dbs-action stop \
   --dbs-provider postgres-v1 \
-  --dbs-action run \
-  --setup-directory-name testing1 \
+  --setup-directory-name pg-example-1 \
   "$@"

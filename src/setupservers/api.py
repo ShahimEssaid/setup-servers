@@ -9,8 +9,12 @@ from importlib.machinery import SourceFileLoader
 import click
 import yaml
 
+import docker
+
 SETUP_INFO_YAML = 'setup-info.yaml'
 WORK_DIRECTORY_NAME = 'work-directory'
+
+docker_client = docker.from_env()
 
 
 #
@@ -77,7 +81,7 @@ class SetupBase:
         self.setup_info = setup_info
         self.setup_home_path = setup_home_path
         self.setup_provider_name = setup_provider_name
-        self.provider_names = provider_names(self.setup_home_path, self.setup_info.setup_name)
+        self.provider_name_relative_path_map = provider_name_dir_map(self.setup_home_path, self.setup_info.setup_name)
 
     def save(self):
         # self.setup_info.info_status = SetupInfo.STATUS_CURRENT
@@ -111,7 +115,7 @@ class SetupProviderBase:
         else:
             provider_module_name += "_".join(dir_parts)
 
-        self.provider_module = load_module(provider_module_name, self.provider_path)
+        self.provider_module = load_module(self.provider_path, provider_module_name)
 
         return self.provider_module
 
@@ -147,12 +151,16 @@ servers_setup = ServersSetup()
 loaded_modules = {}
 
 
-def provider_names(providers_dir_path: pathlib.Path, setup_name: str) -> dict:
+def provider_name_dir_map(providers_dir_path: pathlib.Path, setup_name: str) -> dict:
     provider_dirs = next(os.walk(providers_dir_path))[1]
     provider_dirs.sort()
     providers = {}
     for provider_dir in provider_dirs:
         if provider_dir == setup_name:
+            continue
+        provider_relative = pathlib.Path(provider_dir) / (setup_name.replace('-', '_') + '.py')
+        provider_path = providers_dir_path / provider_relative
+        if not provider_path.exists():
             continue
         name = provider_name(provider_dir)
         if name in providers:
@@ -161,14 +169,14 @@ def provider_names(providers_dir_path: pathlib.Path, setup_name: str) -> dict:
                 f"\n\tin directory {provider_dir}"
                 f"\n\twith existing directory: {providers[name]}."
                 f"\n\tPlease make provider name unique and try again.", 10)
-        providers[name] = provider_dir
+        providers[name] = provider_relative
     return providers
 
 
 def provider_name(directory_name: str):
     if directory_name is None:
         return None
-    provider_dir_clean = re.sub('-{2,}', '--', directory_name)
+    provider_dir_clean = re.sub('--+', '--', directory_name)
     parts = provider_dir_clean.split('--', 1)
     prefix = None
     if len(parts) == 2:
@@ -177,15 +185,28 @@ def provider_name(directory_name: str):
     else:
         name = parts[0]
     name = re.sub('[^a-zA-Z0-9]', '_', name)
-    name = re.sub('_{1,}', '_', name)
+    name = re.sub('_+', '_', name)
     name = name.lower()
     return name
 
 
-def load_module(module_name: str, module_path: pathlib.Path) -> types.ModuleType:
-    module: types.ModuleType = SourceFileLoader("setupservers." + module_name, str(module_path)).load_module()
+def load_module(module_path: pathlib.Path, *name_parts) -> types.ModuleType:
+    module_name = build_module_name(*name_parts)
+    module: types.ModuleType = SourceFileLoader(module_name, str(module_path)).load_module()
     loaded_modules[module.__name__] = module
     return module
+
+
+def build_module_name(*parts):
+    name = 'setupservers.'
+    clean_parts = []
+    for part in parts:
+        part = re.sub('[^a-zA-Z0-9]', '_', part)
+        part = re.sub('_+', '_', part)
+        clean_parts.append(part)
+
+    name += '_'.join(clean_parts)
+    return name;
 
 
 def console_info(message: str, exit_code: int = None):
@@ -205,3 +226,25 @@ def console_message(message: str, color: str, exit_code: int = None):
     if exit_code is not None:
         click.secho(f"Exising code: {exit_code}", fg=color)
         sys.exit(exit_code)  #
+
+
+def docker_container_name(module_name: str, work_dir_name):
+    split = module_name.split('.')
+    name = split[0]
+
+    work_path_string = str(servers_setup.work_directory)
+    pattern = re.compile(r'([a-zA-Z]+)')
+    for (letters) in re.findall(pattern, work_path_string):
+        name += "." + letters[0]
+
+    name += '_' + work_dir_name + '_' + split[1]
+    name = re.sub('[^a-zA-Z0-9_.-]', '_', name)
+    name = re.sub('__+', '_', name)
+    return name
+
+
+def is_port_in_use(host: str, port: int) -> bool:
+    import socket
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        return s.connect_ex((host, port)) == 0

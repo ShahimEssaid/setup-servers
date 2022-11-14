@@ -45,7 +45,7 @@ class RunCli(click.MultiCommand):
         ns = {}
         name_part = name.replace("-", "_")
         command_path = servers_setup.home_directory / name / name / (name_part + ".py")
-        command_module = setupservers.load_module(name_part, command_path)
+        command_module = setupservers.load_module(command_path, name_part)
         command = getattr(command_module, name_part + '_command')
         return command
 
