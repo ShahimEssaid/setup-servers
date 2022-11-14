@@ -4,6 +4,7 @@ import shutil
 import sys
 import click
 
+import setupservers
 from setupservers import servers_setup
 
 from setupservers import api
@@ -23,7 +24,7 @@ click.core.Option.__init__ = _new_init
 
 class RunCli(click.MultiCommand):
     def __init__(self, name, **kwargs):
-        super().__init__(self, name, chain=True, **kwargs)
+        super().__init__(name, chain=True, **kwargs)
 
     def list_commands(self, ctx):
 
@@ -42,13 +43,10 @@ class RunCli(click.MultiCommand):
 
     def get_command(self, ctx, name):
         ns = {}
-        command_path = servers_setup.home_directory / name / name / (name.replace("-", "_") + ".py")
-        command_module = api.load_module(name.replace("-", "_"), command_path)
-        command = getattr(command_module, name.replace("-", "_") + '_command')
-        # with open(command_path) as f:
-        #     code = compile(f.read(), name + ".py", 'exec')
-        #     eval(code, ns, ns)
-        #     command = ns[name.replace("-", "_")]
+        name_part = name.replace("-", "_")
+        command_path = servers_setup.home_directory / name / name / (name_part + ".py")
+        command_module = api.load_module(name_part, command_path)
+        command = getattr(command_module, name_part + '_command')
         return command
 
 
@@ -59,15 +57,14 @@ class RunCli(click.MultiCommand):
               default=pathlib.Path(os.curdir).absolute() / "working-directory")
 @click.option('--remote-pycharm-debug', is_flag=True)
 @click.option('--pycharm-host')
-@click.option('--pycharm-port', type=int )
+@click.option('--pycharm-port', type=int)
 def run(home_dir, working_dir, remote_pycharm_debug, pycharm_host=None, pycharm_port=None):
     if remote_pycharm_debug:
         import pydevd_pycharm
-        pydevd_pycharm.settrace(pycharm_host, port=pycharm_port, stdoutToServer = True, stderrToServer = True)
-
+        pydevd_pycharm.settrace(pycharm_host, port=pycharm_port, stdoutToServer=True, stderrToServer=True,
+                                suspend=False)
     servers_setup.home_directory = home_dir;
     servers_setup.working_directory = working_dir;
-    print("Running")
     servers_setup.run()
 
 
@@ -76,10 +73,7 @@ def run(home_dir, working_dir, remote_pycharm_debug, pycharm_host=None, pycharm_
               default=pathlib.Path(os.curdir).absolute())
 @click.option("--working-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True),
               default=pathlib.Path(os.curdir).absolute() / "working-directory")
-
 def install(home_dir, working_dir):
-
-
     print("Installing")
     servers_setup.home_directory = home_dir;
     servers_setup.working_directory = working_dir;
