@@ -1,7 +1,7 @@
 /.venv/
 /build/
 /dist/
-/src/setup_server.egg-info/
+/src/*.egg-info/
 /env.sh
 /env-local.sh
 /env-local-example.sh
