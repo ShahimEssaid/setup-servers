@@ -9,49 +9,79 @@ from importlib.machinery import SourceFileLoader
 import click
 import yaml
 
-
-class BaseInfo(yaml.YAMLObject):
-    NEW = 'New'
-    CURRENT = 'Current'
-    CLOSED = 'Closed'
-
-    def __init__(self):
-        self.info_status: str = BaseInfo.NEW
-        self.setup_name: typing.Optional[str] = None
+SETUP_INFO_YAML = 'setup-info.yaml'
+WORK_DIRECTORY_NAME = 'work-directory'
 
 
-class DbInfo(BaseInfo):
-    def __init__(self):
-        super().__init__()
-        self.dbs_name: typing.Optional[str] = None
-        self.dbs_version: typing.Optional[str] = None
+#
+# class BaseInfo(yaml.YAMLObject):
+#     NEW = 'New'
+#     CURRENT = 'Current'
+#     CLOSED = 'Closed'
+#
+#     def __init__(self):
+#         self.info_status: str = BaseInfo.NEW
+#         self.setup_name: typing.Optional[str] = None
+#
+#
+# class DbInfo(BaseInfo):
+#     def __init__(self):
+#         super().__init__()
+#         self.dbs_name: typing.Optional[str] = None
+#         self.dbs_version: typing.Optional[str] = None
+
+
+class SetupInfo:
+    STATUS_NEW = 'New'
+    STATUS_CREATED = 'Created'
+    STATUS_CURRENT = 'Current'
+    STATUS_CLOSED = 'Closed'
+
+    INFO_STATUS = 'info_status'
+
+    def __init__(self, setup_directory_path: typing.Union[str, pathlib.Path]):
+        setup_path = pathlib.Path(str(setup_directory_path))
+        setup_info_path = setup_path / SETUP_INFO_YAML
+
+        if setup_info_path.exists():
+            with open(setup_info_path) as f:
+                self.__dict__ = yaml.unsafe_load(f)
+        else:
+            self.info_status = SetupInfo.STATUS_NEW
+
+        self.setup_path: str = str(setup_path)
+        self.setup_info_path: str = str(setup_info_path)
+
+    def __getattr__(self, item):
+        return None
+
+    def save(self):
+        setup_info_path = pathlib.Path(self.setup_info_path)
+        setup_info_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(setup_info_path, 'w') as f:
+            f.write(yaml.dump(self.__dict__))
 
 
 class SetupBase:
 
-    def __init__(self, setup_name: str, setup_home_path: pathlib.Path, setup_provider_name: str,
-                 setup_working_directory_name: str,
-                 info_typing: typing.Type[BaseInfo]):
-        self.setup_name: str = setup_name
+    def __init__(self, setup_name: str, setup_info: SetupInfo, setup_home_path: pathlib.Path, setup_provider_name: str):
+        if setup_info.info_status == SetupInfo.STATUS_CLOSED:
+            raise Exception("SetupInfo already closed")
+
+        if setup_info.info_status == SetupInfo.STATUS_NEW:
+            setup_info.setup_name = setup_name
+        else:
+            if setup_info.setup_name != setup_name:
+                raise Exception(f"Setup name {setup_name} did not match setup info name {setup_info.setup_name}")
+
+        self.setup_info = setup_info
         self.setup_home_path = setup_home_path
         self.setup_provider_name = setup_provider_name
-        self.setup_working_path: pathlib.Path = servers_setup.working_directory / setup_working_directory_name
-        self.info_typing: typing.Type[BaseInfo] = info_typing
+        self.provider_names = provider_names(self.setup_home_path, self.setup_info.setup_name)
 
-        # setup info
-        self.setup_working_path.mkdir(exist_ok=True)
-        self.info_path = self.setup_working_path / (self.setup_name + ".yaml")
-        self._info = load_info(self.info_path, self.info_typing)
-        if self._info.info_status == BaseInfo.CLOSED:
-            console_error("Setup {}")
-        if self._info.info_status == BaseInfo.NEW:
-            self._info.setup_name = self.setup_name
-
-        self.provider_names = provider_names(self.setup_home_path, self.setup_name)
-
-    def save_setup(self):
-        self._info.info_status = BaseInfo.CURRENT
-        save_info(self.info_path, self._info)
+    def save(self):
+        # self.setup_info.info_status = SetupInfo.STATUS_CURRENT
+        self.setup_info.save()
 
 
 class SetupProviderBase:
@@ -89,7 +119,24 @@ class SetupProviderBase:
 class ServersSetup:
     def __init__(self):
         self.home_directory: pathlib.Path = pathlib.Path(os.curdir).absolute()
-        self.working_directory: pathlib.Path = pathlib.Path(os.curdir).absolute() / "working-directory"
+        self.work_directory: pathlib.Path = pathlib.Path(os.curdir).absolute() / WORK_DIRECTORY_NAME
+        self.setups = {}
+
+    def initialize(self):
+        work_dirs = next(os.walk(self.work_directory))[1]
+        for work_dir in work_dirs:
+            work_dir_path = self.work_directory / work_dir
+            if (work_dir_path / SETUP_INFO_YAML).exists():
+                self.setups[work_dir] = SetupInfo(work_dir_path)
+
+    def get_setup_info(self, setup_directory_name: str) -> SetupInfo:
+        if setup_directory_name in self.setups:
+            return self.setups[setup_directory_name]
+        else:
+            console_warn(f"Creating new setup at: {setup_directory_name}")
+            setup_info = SetupInfo(self.work_directory / setup_directory_name)
+            self.setups[setup_directory_name] = setup_info
+            return setup_info
 
     def run(self):
         pass
@@ -141,22 +188,6 @@ def load_module(module_name: str, module_path: pathlib.Path) -> types.ModuleType
     return module
 
 
-def load_info(info_path: pathlib.Path, info_type: typing.Type[BaseInfo]) -> BaseInfo:
-    if info_path.exists():
-        with open(info_path) as f:
-            info = yaml.unsafe_load(f)
-    else:
-        info = info_type()
-        with open(info_path, 'w') as f:
-            f.write(yaml.dump(info))
-    return info
-
-
-def save_info(info_path: pathlib.Path, info: BaseInfo) -> None:
-    with open(info_path, 'w') as f:
-        f.write(yaml.dump(info))
-
-
 def console_info(message: str, exit_code: int = None):
     console_message(message, 'green', exit_code)
 
@@ -174,39 +205,3 @@ def console_message(message: str, color: str, exit_code: int = None):
     if exit_code is not None:
         click.secho(f"Exising code: {exit_code}", fg=color)
         sys.exit(exit_code)  #
-# def save_info(info, setup_name, setup_directory_name):
-#     infos = load_infos(setup_name)
-#     if hasattr(infos, setup_directory_name):
-#         if not infos[setup_directory_name] is info:
-#             raise Exception(
-#                 "Saving info object while already have a different object for same name: {name} "
-#                 "and setup directory: {directory}".format(
-#                     name=setup_name, directory=setup_directory_name))
-#     else:
-#         infos[setup_directory_name] = info
-#
-#     info_path = servers_setup.working_directory / setup_directory_name / (setup_name + '.yaml')
-#     with open(info_path, 'w') as f:
-#         f.write(yaml.dump(info))
-#
-#
-# def load_infos(setup_name) -> dict:
-#     if not hasattr(setup_infos, setup_name):
-#         setup_infos[setup_name] = {}
-#         for setup_dir in next(os.walk(servers_setup.working_directory))[1]:
-#             info_path = servers_setup.working_directory / setup_dir / (setup_name + ".yaml")
-#             if info_path.exists():
-#                 with open(info_path) as f:
-#                     info = yaml.safe_load(f)
-#                     if hasattr(info, 'setup_directory'):
-#                         info_setup_dir = info.setup_directory
-#                         if info_setup_dir != setup_dir:
-#                             raise Exception(
-#                                 "Info directory: {dir} does not match setup directory: {setup}".format(
-#                                     dir=info_setup_dir,
-#                                     setup=setup_dir))
-#                     setup_infos[setup_name][setup_dir] = info
-#     return setup_infos[setup_name]
-#
-#
-# setup_infos = {}

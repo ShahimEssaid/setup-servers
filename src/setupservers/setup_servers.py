@@ -6,10 +6,10 @@ import click
 
 import setupservers
 from setupservers import servers_setup
-
-from setupservers import api
+import setupservers
 
 TEMPLATE = os.path.join(os.path.dirname(__file__), "../template/")
+
 
 orig_init = click.core.Option.__init__
 
@@ -45,7 +45,7 @@ class RunCli(click.MultiCommand):
         ns = {}
         name_part = name.replace("-", "_")
         command_path = servers_setup.home_directory / name / name / (name_part + ".py")
-        command_module = api.load_module(name_part, command_path)
+        command_module = setupservers.load_module(name_part, command_path)
         command = getattr(command_module, name_part + '_command')
         return command
 
@@ -53,30 +53,31 @@ class RunCli(click.MultiCommand):
 @click.command(cls=RunCli)
 @click.option("--home-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True, exists=True),
               default=pathlib.Path(os.curdir).absolute())
-@click.option("--working-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True, exists=True),
-              default=pathlib.Path(os.curdir).absolute() / "working-directory")
+@click.option("--work-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True, exists=True),
+              default=pathlib.Path(os.curdir).absolute() / setupservers.WORK_DIRECTORY_NAME)
 @click.option('--remote-pycharm-debug', is_flag=True)
 @click.option('--pycharm-host')
 @click.option('--pycharm-port', type=int)
-def run(home_dir, working_dir, remote_pycharm_debug, pycharm_host=None, pycharm_port=None):
+def run(home_dir, work_dir, remote_pycharm_debug, pycharm_host=None, pycharm_port=None):
     if remote_pycharm_debug:
         import pydevd_pycharm
         pydevd_pycharm.settrace(pycharm_host, port=pycharm_port, stdoutToServer=True, stderrToServer=True,
                                 suspend=False)
     servers_setup.home_directory = home_dir;
-    servers_setup.working_directory = working_dir;
+    servers_setup.work_directory = work_dir;
+    servers_setup.initialize()
     servers_setup.run()
 
 
 @click.command()
 @click.option("--home-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True),
               default=pathlib.Path(os.curdir).absolute())
-@click.option("--working-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True),
-              default=pathlib.Path(os.curdir).absolute() / "working-directory")
-def install(home_dir, working_dir):
+@click.option("--work-dir", type=click.Path(path_type=pathlib.Path, resolve_path=True),
+              default=pathlib.Path(os.curdir).absolute() / setupservers.WORK_DIRECTORY_NAME)
+def install(home_dir, work_dir):
     print("Installing")
     servers_setup.home_directory = home_dir;
-    servers_setup.working_directory = working_dir;
+    servers_setup.work_directory = work_dir;
     os.makedirs(home_dir, exist_ok=True)
-    os.makedirs(working_dir, exist_ok=True)
+    os.makedirs(work_dir, exist_ok=True)
     shutil.copytree(TEMPLATE, home_dir, dirs_exist_ok=True)

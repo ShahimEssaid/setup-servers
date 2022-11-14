@@ -25,5 +25,8 @@ setup-servers  \
   --remote-pycharm-debug \
   --pycharm-host localhost \
   --pycharm-port 11111 \
-  setup-db --setup-directory-name testing1 \
+  setup-db \
+  --dbs-name postgres \
+  --dbs-version 1.2.3 \
+  --setup-directory-name testing1 \
   "$@"
