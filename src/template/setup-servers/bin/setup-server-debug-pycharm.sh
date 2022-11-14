@@ -22,7 +22,7 @@ cd "$SETUP_SERVER_HOME"
 
 . "${SETUP_SERVER_VENV}/bin/activate"
 setup-servers \
-  --remote-pycharm-debug \
+  #--remote-pycharm-debug \
   --pycharm-host localhost \
   --pycharm-port 11111 \
   setup-db \

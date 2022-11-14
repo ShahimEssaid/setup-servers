@@ -21,8 +21,26 @@ cd "$SETUP_SERVER_HOME"
 #  =========== END OF COMMON HEADER. See setup_servers/setup-db/.template.sh
 
 . "${SETUP_SERVER_VENV}/bin/activate"
+#setup-servers \
+#  --remote-pycharm-debug \
+#  --pycharm-host localhost \
+#  --pycharm-port 11111 \
+#  setup-db \
+#  --dbs-name postgres \
+#  --dbs-version latest \
+#  --dbs-user postgres \
+#  --dbs-pass postgres \
+#  --dbs-uid $(id -u) \
+#  --dbs-host localhost \
+#  --dbs-port 7777 \
+#  --dbs-provider postgres-v1 \
+#  --dbs-action run \
+#  --setup-directory-name pg-example-1 \
+#  "$@"
+
+
+# no debug
 setup-servers \
-  --remote-pycharm-debug \
   --pycharm-host localhost \
   --pycharm-port 11111 \
   setup-db \
