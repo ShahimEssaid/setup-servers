@@ -1,4 +1,5 @@
-#!/usr/setup-db/env bash
+#!/usr/bin/env bash
+
 #set -x
 set -e
 set -u
@@ -14,10 +15,9 @@ while [ -h "$SOURCE" ]; do
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
 DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
-export SETUP_SERVER_HOME=$(realpath "${DIR}/../..")
-cd "$SETUP_SERVER_HOME"
-. "${SETUP_SERVER_HOME}/env.sh"
+SS_HOME=$(realpath "${DIR}/..")
 
-#  =========== END OF COMMON HEADER. See setup_servers/setup-db/.template.sh
+. "${SS_HOME}/.venv/bin/activate"
 
-. "${SETUP_SERVER_VENV}/bin/activate"
+setup-servers py-debug postgres-docker --docker-tag latest --action dbs-start
+

@@ -16,6 +16,8 @@ class DBServerState(ActionState):
     def __init__(self, path: pathlib.Path):
         super(DBServerState, self).__init__(path)
 
+        if not hasattr(self, 'dbs_type'):
+            self.dbs_type: t.Optional[str] = None
         if not hasattr(self, 'dbs_user'):
             self.dbs_user: t.Optional[str] = None
         if not hasattr(self, 'dbs_pass'):
@@ -35,6 +37,22 @@ class DBServerState(ActionState):
             self.databases: t.Dict[str, DBDatabase] = {}
 
     def _clear(self):
+        self.dbs_status = None
         self.dbs_host = None
         self.dbs_port = None
         self.dbs_port_preferred = None
+
+
+class FhirServerState(ActionState):
+    def __init__(self, path: pathlib.Path):
+        super(FhirServerState, self).__init__(path)
+
+        if not hasattr(self, 'fhir_url'):
+            self.fhir_url: t.Optional[str] = None
+        if not hasattr(self, 'fhir_version'):
+            self.fhir_version: t.Optional[str] = None
+        if not hasattr(self, 'pid'):
+            self.pid: t.Optional[int] = None
+        if not hasattr(self, 'status'):
+            self.status: t.Optional[str] = None
+

@@ -10,5 +10,5 @@ class SetupServerCommands(clickactions.Commands):
 
 @click.command(cls=SetupServerCommands)
 def commands():
-    print("SetupServersCli running")
+    # print("SetupServersCli running")
     pass

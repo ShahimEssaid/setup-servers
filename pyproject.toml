@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "setup-servers"
-version = "0.1.5"
+version = "0.1.6"
 
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -12,18 +12,21 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 dependencies = [
-    'click',
-    "filelock",
-    "pyyaml",
-    "docker"
+    'stevedore',
+    'sh',
+    'clickactions',
+    'filelock',
+    'pyyaml',
+    'docker',
+    'GitPython'
 ]
 
-requires-python = ">=3.9"
+requires-python = ">=3.8"
 authors = [{ name = "Shahim Essaid" }]
 
 [project.scripts]
-setup-servers = "setupservers.setup_servers:run"
-setup-servers-install = "setupservers.setup_servers:install"
+setup-servers = "setupservers.commands:commands"
+#setup-servers-install = "setupservers.setup_servers:install"
 
 [tool.setuptools]
 zip-safe = false
@@ -31,4 +34,8 @@ include-package-data = true
 
 [project.optional-dependencies]
 build = ["build", "twine"]
-pycharm = ['pydevd-pycharm~=222.4345.23']
+
+[project.entry-points."setupservers.command"]
+postgres-docker = "setupservers.command.postgres_docker:command"
+hapi-jpa-starter = "setupservers.command.hapi_jpa_starter:command"
+init = "setupservers.command.init:command"

@@ -1,4 +1,5 @@
 import errno
+import os
 import pathlib
 import re
 import socket
@@ -16,7 +17,7 @@ def is_port_available(host, port):
     return True
 
 
-def find_free_port(host, port):
+def find_free_port(host, port: int):
     if is_port_available(host, port):
         return port
     with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
@@ -45,15 +46,44 @@ def download_file(url, to_path: pathlib.Path):
     if response.status_code == 200:
         with open(to_path, 'wb') as f:
             f.write(response.raw.read())
+    else:
+        raise Exception(str(response))
 
 
 def unpack_targz(file: pathlib.Path, to_dir_path: pathlib.Path):
     import tarfile
     if file.name.endswith("tar.gz"):
-        tar = tarfile.open(file, "r:gz")
-        tar.extractall(path=to_dir_path)
-        tar.close()
+        with tarfile.open(file, "r:gz") as tar:
+            tar.extractall(path=to_dir_path)
     elif file.name.endswith("tar"):
-        tar = tarfile.open(file, "r:")
-        tar.extractall(path=to_dir_path)
-        tar.close()
+        with tarfile.open(file, "r:") as tar:
+            tar.extractall(path=to_dir_path)
+
+
+def pid_exists(pid):
+    """Check whether pid exists in the current process table.
+    UNIX only.
+    """
+    if pid < 0:
+        return False
+    if pid == 0:
+        # According to "man 2 kill" PID 0 refers to every process
+        # in the process group of the calling process.
+        # On certain systems 0 is a valid PID but we have no way
+        # to know that in a portable fashion.
+        raise ValueError('invalid PID 0')
+    try:
+        os.kill(pid, 0)
+    except OSError as err:
+        if err.errno == errno.ESRCH:
+            # ESRCH == No such process
+            return False
+        elif err.errno == errno.EPERM:
+            # EPERM clearly means there's a process to deny access to
+            return True
+        else:
+            # According to "man 2 kill" possible error values are
+            # (EINVAL, EPERM, ESRCH)
+            raise
+    else:
+        return True
