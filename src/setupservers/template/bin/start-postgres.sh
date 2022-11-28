@@ -19,5 +19,5 @@ SS_HOME=$(realpath "${DIR}/..")
 
 . "${SS_HOME}/.venv/bin/activate"
 
-setup-servers py-debug postgres-docker --docker-tag latest --action dbs-start
+setup-servers postgres-docker --docker-tag latest --action dbs-start
 

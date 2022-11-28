@@ -1,4 +1,3 @@
-python3 -m twine upload --repository testpypi dist/*
-python3 -m twine upload dist/*
+See the following doc for WIP documentation and notes:
 
-python3 -m pip install --extra-index-url https://test.pypi.org/simple/ setup-servers==0.1.5
+https://docs.google.com/document/d/169M48wSEgPMoLNqKfICwOSqd1oLTARgoT5Td_yGc_u4/edit

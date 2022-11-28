@@ -19,6 +19,6 @@ SS_HOME=$(realpath "${DIR}/..")
 
 . "${SS_HOME}/.venv/bin/activate"
 
-setup-servers py-debug hapi-jpa-starter --dbs-work-dir postgres-docker --action hapi-start
+setup-servers hapi-jpa-starter --dbs-work-dir postgres-docker --action hapi-start
 
 
