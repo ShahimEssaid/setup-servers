@@ -18,7 +18,7 @@ DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
 cd "${DIR}/.."
 
-rm -rf dist
+rm -rf dist build
 
 pip install -U ".[build]"
 python3 -m build

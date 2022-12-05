@@ -26,6 +26,7 @@ class HapiJpaStarterParams(object):
         self.git_url: t.Optional[str] = None
         self.git_ref: t.Optional[str] = None
         self.mvn_local_repo: t.Optional[str] = None
+        self.mvn_rebuild: t.Optional[bool] = False
         self.dbs_work_dir: t.Optional[str] = None
         self.actions: t.Optional[t.List[str]] = []
 
@@ -52,6 +53,7 @@ class HapiJpaStarterState(FhirServerState):
 @click.option('--git-url', default='https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git')
 @click.option('--git-ref', default='master')
 @click.option('--mvn-local-repo', default='.m2')
+@click.option('--mvn-rebuild', is_flag=True)
 @click.option('--dbs-work-dir')
 @click.option('--spring-profiles', default='local')
 @click.option('--action', multiple=True, help='hapi-start  hapi-stop')
@@ -67,6 +69,7 @@ def command(
         git_url,
         git_ref,
         mvn_local_repo,
+        mvn_rebuild,
         dbs_work_dir,
         action,
 
@@ -85,6 +88,7 @@ def command(
     params.git_url = git_url
     params.git_ref = git_ref
     params.mvn_local_repo = mvn_local_repo
+    params.mvn_rebuild = mvn_rebuild
     params.dbs_work_dir = dbs_work_dir
     params.actions = action
 
@@ -115,7 +119,7 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
         self.maven_home = self.state.path / MAVEN_DIR
 
         mvn_local_repo = Path(state.params.mvn_local_repo)
-        if mvn_local_repo.absolute():
+        if mvn_local_repo.is_absolute():
             self.maven_repo = mvn_local_repo
         else:
             self.maven_repo = self.state.path / mvn_local_repo
@@ -150,7 +154,7 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
             self.state.pid = None
             self.state.status = 'stopped'
 
-        if self.state.git_sha != self.requested_sha:
+        if self.state.git_sha != self.requested_sha or self.state.params.mvn_rebuild:
             # we need to rebuild
             if self.state.status == 'running':
                 raise Exception('Requested to start hapi with a different build but it is running. Stop hapi first.')
@@ -230,7 +234,6 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
             if err.errno == errno.ESRCH:
                 self.logger.info("HAPI not running but state file is not up to date.")
 
-
         for i in range(10):
             try:
                 os.kill(self.state.pid, 0)
@@ -279,6 +282,7 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
             [
                 self.mvn_cmd,
                 f'-Dmaven.repo.local={str(self.maven_repo)}',
+                '-U',
                 '-f',
                 str(self.hapi_repo / 'pom.xml'),
                 '-Pboot',
