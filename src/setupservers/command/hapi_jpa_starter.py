@@ -1,9 +1,11 @@
+import errno
 import os
 import pathlib
 import platform
 import shutil
 import signal
 import subprocess
+import time
 import typing as t
 from pathlib import Path
 from subprocess import CompletedProcess
@@ -21,9 +23,19 @@ from setupservers import FhirServerState
 
 class HapiJpaStarterParams(object):
     def __init__(self):
+        self.git_url: t.Optional[str] = None
         self.git_ref: t.Optional[str] = None
+        self.mvn_local_repo: t.Optional[str] = None
         self.dbs_work_dir: t.Optional[str] = None
-        self.actions: t.Optional[t.List] = [None]
+        self.actions: t.Optional[t.List[str]] = []
+
+        self.java_debug: t.Optional[bool] = False
+        self.java_debug_attach: t.Optional[bool] = False
+        self.java_debug_suspend: t.Optional[bool] = False
+        self.java_debug_ip: t.Optional[str] = None
+        self.java_debug_port: t.Optional[int] = None
+
+        self.spring_profiles: t.Optional[str] = None
 
 
 class HapiJpaStarterState(FhirServerState):
@@ -36,36 +48,63 @@ class HapiJpaStarterState(FhirServerState):
 
 
 @click.command(name='hapi-jpa-starter', cls=Command)
-@click.option("--work-dir", help="The work directory for this run of the command.")
-@click.option("--git-ref", default='master')
-@click.option("--dbs-work-dir")
-@click.option("--action", multiple=True, help='hapi-start  hapi-stop')
+@click.option('--work-dir', help='The work directory for this run of the command.')
+@click.option('--git-url', default='https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git')
+@click.option('--git-ref', default='master')
+@click.option('--mvn-local-repo', default='.m2')
+@click.option('--dbs-work-dir')
+@click.option('--spring-profiles', default='local')
+@click.option('--action', multiple=True, help='hapi-start  hapi-stop')
+@click.option('--java-debug', is_flag=True)
+@click.option('--java-debug-attach', is_flag=True)
+@click.option('--java-debug-suspend', is_flag=True)
+@click.option('--java-debug-ip', default='127.0.0.1')
+@click.option('--java-debug-port', type=int, default=8999)
 @click.pass_context
 def command(
         ctx: click.Context,
         work_dir,
+        git_url,
         git_ref,
+        mvn_local_repo,
         dbs_work_dir,
-        action
+        action,
+
+        java_debug,
+        java_debug_attach,
+        java_debug_suspend,
+        java_debug_ip,
+        java_debug_port,
+
+        spring_profiles
 ):
     actions: Actions = ctx.obj
     state: HapiJpaStarterState = actions.get_action_state(work_dir or ctx.command.name, HapiJpaStarterState)
 
     params = state.params
+    params.git_url = git_url
     params.git_ref = git_ref
+    params.mvn_local_repo = mvn_local_repo
     params.dbs_work_dir = dbs_work_dir
     params.actions = action
 
+    params.java_debug = java_debug
+    params.java_debug_attach = java_debug_attach
+    params.java_debug_suspend = java_debug_suspend
+    params.java_debug_ip = java_debug_ip
+    params.java_debug_port = java_debug_port
+
+    params.spring_profiles = spring_profiles
+
     hapi = HapiJpaStarterAction(actions, state)
     hapi.run()
-    print('Finished running HAPI')
 
 
 MAVEN_DIR = pathlib.Path('apache-maven-3.8.6')
 MAVEN_TAR_GZ = pathlib.Path(f'{MAVEN_DIR}-bin.tar.gz')
 MAVEN_URL = f'https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/{MAVEN_TAR_GZ}'
 
-HAPI_GIT_URL = 'https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git'
+# HAPI_GIT_URL = 'https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git'
 HAPI_GIT_DIR = pathlib.Path('hapi-jpa-starter')
 HAPI_RUN_DIR = 'hapi-run'
 
@@ -74,7 +113,13 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
     def __init__(self, actions: Actions, state: HapiJpaStarterState):
         super(HapiJpaStarterAction, self).__init__(actions, state)
         self.maven_home = self.state.path / MAVEN_DIR
-        self.maven_repo = self.state.path / '.m2'
+
+        mvn_local_repo = Path(state.params.mvn_local_repo)
+        if mvn_local_repo.absolute():
+            self.maven_repo = mvn_local_repo
+        else:
+            self.maven_repo = self.state.path / mvn_local_repo
+
         if platform.system() == 'Windows':
             self.mvn_cmd = str(
                 self.state.path / MAVEN_DIR / 'bin' / 'mvn.cmd')
@@ -101,7 +146,7 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
     def _hapi_start(self):
         self._hapi_build_prepare()
 
-        if self.state.pid is not None and  not setupservers.pid_exists(self.state.pid):
+        if self.state.pid is not None and not setupservers.pid_exists(self.state.pid):
             self.state.pid = None
             self.state.status = 'stopped'
 
@@ -142,13 +187,19 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
         with open(self.hapi_run_path / 'application-local.yaml', 'w') as f:
             yaml.safe_dump(hapi_local_config, f)
 
-        args = [
-            'java',
+        args = ['java',
+                f'-Dspring.profiles.active={self.state.params.spring_profiles}',
+                f'-Dlogging.config={str(self.hapi_run_path / "logback.xml")}'
+                ]
+
+        if self.state.params.java_debug:
+            pass
+
+        # todo: finish command
+        args.extend([
             '-jar',
-            '-Dspring.profiles.active=local',
-            f'-Dlogging.config={str(self.hapi_run_path / "logback.xml")}',
             'ROOT.war'
-        ]
+        ])
 
         if self.db_server is not None and self.db_server.dbs_type == 'postgres':
             args.extend([
@@ -162,12 +213,29 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
         self.state.pid = p.pid
         self.state.status = 'running'
         self.state.save()
+        self.logger.info(f"HAPI FHIR endpoint starting on: {self.state.fhir_url}")
 
     def _hapi_stop(self):
-        os.kill(self.state.pid, signal.SIGINT)
+        if self.state.pid is None:
+            self.logger.info("HAPI already stopped.")
+            return
+        os.kill(self.state.pid, signal.SIGTERM)
+
+        for i in range(10):
+            try:
+                os.kill(self.state.pid, 0)
+                time.sleep(i)
+            except OSError as err:
+                if err.errno == errno.ESRCH:
+                    # no such process
+                    break
+                else:
+                    # some other error
+                    raise err
         self.state.pid = None
         self.state.status = 'stopped'
         self.state.save()
+        self.logger.info(f"HAPI stopped")
 
     def _hapi_build_prepare(self):
         # install maven if needed
@@ -177,7 +245,7 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
 
         # clone and checkout hapi starter
         if not self.hapi_repo.exists():
-            git.Repo = git.Repo.clone_from(HAPI_GIT_URL, self.hapi_repo)
+            git.Repo = git.Repo.clone_from(self.state.params.git_url, self.hapi_repo)
 
         repo = Repo(self.hapi_repo)
         origin = repo.remotes.origin
@@ -196,7 +264,6 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
         repo.close()
 
     def _hapi_build(self):
-
         # build and install
         completed: Union[CompletedProcess[Any], CompletedProcess[bytes]] = subprocess.run(
             [

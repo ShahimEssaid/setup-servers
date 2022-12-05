@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = "setup-servers"
-version = "0.1.7"
+version = "0.1.8"
 
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -13,8 +13,7 @@ classifiers = [
 ]
 dependencies = [
     'stevedore',
-    'sh',
-    'clickactions',
+    'clickactions == 0.1.1',
     'filelock',
     'pyyaml',
     'docker',

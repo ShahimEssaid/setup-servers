@@ -126,6 +126,7 @@ class PostgresDockerAction(Action[PostgresDockerState]):
         if self.state.container_uuid:
             container = self.docker_client.containers.get(self.state.container_uuid)
             container.start()
+            attrs = container.attrs
         else:
             self.state.docker_tag = self.state.docker_tag or self.state.params.docker_tag
 
@@ -170,6 +171,8 @@ class PostgresDockerAction(Action[PostgresDockerState]):
         self.state.dbs_status = container.status
         self.state.dbs_type = 'postgres'
         self.state.save()
+        self.logger.info(f"Started PostgreSQL on {self.state.dbs_host}:{self.state.dbs_port} from directory: {self.state.path}.")
+        self.logger.info(f"Docker UUID: {self.state.container_uuid}")
 
     def dbs_stop(self):
         if self.state.container_uuid:
@@ -185,6 +188,9 @@ class PostgresDockerAction(Action[PostgresDockerState]):
                         break
                     time.sleep(i)
                 self.state.dbs_status = container.status
+            self.logger.info(f"Stopped PostgreSQL on {self.state.dbs_host}:{self.state.dbs_port} from directory: {self.state.path}")
+        else:
+            self.logger.info(f"PostgreSQL already stopped from directory: {self.state.path}")
         self.state.save()
 
     def docker_remove(self):
@@ -192,6 +198,7 @@ class PostgresDockerAction(Action[PostgresDockerState]):
             container: Container = self.docker_client.containers.get(self.state.container_uuid)
             container.stop()
             container.remove()
+            self.logger.info(f"Removing PostgreSQL Docker container id: {self.state.container_uuid}")
             self.state._clear()
             self.state.save()
 

@@ -15,10 +15,11 @@ while [ -h "$SOURCE" ]; do
   [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
 done
 DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
-SS_HOME=$(realpath "${DIR}/..")
 
-. "${SS_HOME}/.venv/bin/activate"
+cd "${DIR}/.."
 
-setup-servers hapi-jpa-starter --dbs-work-dir postgres-docker --action hapi-start
+rm -rf dist
 
-
+pip install -U ".[build]"
+python3 -m build
+python3 -m twine upload -u __token__ dist/*
