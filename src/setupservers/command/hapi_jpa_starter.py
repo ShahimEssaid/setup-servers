@@ -193,9 +193,14 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
                 ]
 
         if self.state.params.java_debug:
-            pass
+            server = 'n' if self.state.params.java_debug_attach else 'y'
+            suspend = 'y' if self.state.params.java_debug_suspend else 'n'
+            address = self.state.params.java_debug_ip
+            port = setupservers.find_free_port(address, int(self.state.params.java_debug_port))
+            agent = f"-agentlib:jdwp=transport=dt_socket,server={server},suspend={suspend},address={address}:{port}"
+            args.append(agent)
+            self.logger.info(f"HAPI {self.state.path.name} debugger configured as: {agent}")
 
-        # todo: finish command
         args.extend([
             '-jar',
             'ROOT.war'
@@ -219,7 +224,12 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
         if self.state.pid is None:
             self.logger.info("HAPI already stopped.")
             return
-        os.kill(self.state.pid, signal.SIGTERM)
+        try:
+            os.kill(self.state.pid, signal.SIGTERM)
+        except OSError as err:
+            if err.errno == errno.ESRCH:
+                self.logger.info("HAPI not running but state file is not up to date.")
+
 
         for i in range(10):
             try:
