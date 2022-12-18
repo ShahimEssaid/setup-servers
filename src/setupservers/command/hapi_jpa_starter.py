@@ -25,6 +25,7 @@ class HapiJpaStarterParams(object):
     def __init__(self):
         self.git_url: t.Optional[str] = None
         self.git_ref: t.Optional[str] = None
+        self.hapi_port: t.Optional[int] = None
         self.mvn_local_repo: t.Optional[str] = None
         self.mvn_rebuild: t.Optional[bool] = False
         self.dbs_work_dir: t.Optional[str] = None
@@ -52,6 +53,7 @@ class HapiJpaStarterState(FhirServerState):
 @click.option('--work-dir', help='The work directory for this run of the command.')
 @click.option('--git-url', default='https://github.com/hapifhir/hapi-fhir-jpaserver-starter.git')
 @click.option('--git-ref', default='master')
+@click.option('--hapi-port', type=int, default=8888)
 @click.option('--mvn-local-repo', default='.m2')
 @click.option('--mvn-rebuild', is_flag=True)
 @click.option('--dbs-work-dir')
@@ -68,6 +70,7 @@ def command(
         work_dir,
         git_url,
         git_ref,
+        hapi_port,
         mvn_local_repo,
         mvn_rebuild,
         dbs_work_dir,
@@ -87,6 +90,7 @@ def command(
     params = state.params
     params.git_url = git_url
     params.git_ref = git_ref
+    params.hapi_port = hapi_port
     params.mvn_local_repo = mvn_local_repo
     params.mvn_rebuild = mvn_rebuild
     params.dbs_work_dir = dbs_work_dir
@@ -171,7 +175,7 @@ class HapiJpaStarterAction(Action[HapiJpaStarterState]):
         if 'server' not in hapi_local_config:
             hapi_local_config['server'] = {}
 
-        port = setupservers.find_free_port('localhost', 8080)
+        port = setupservers.find_free_port('localhost', self.state.params.hapi_port)
 
         hapi_local_config['server']['port'] = port
 
